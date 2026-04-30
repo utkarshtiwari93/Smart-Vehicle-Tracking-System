@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Vehicle Tracker — Login</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0f172a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 40px;
+            border-radius: 16px;
+            width: 380px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+
+        h2 {
+            color: #38bdf8;
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 24px;
+        }
+
+        p {
+            color: #94a3b8;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #f1f5f9;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input:focus { border-color: #38bdf8; }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #38bdf8;
+            color: #0f172a;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 12px;
+        }
+
+        button:hover { background: #7dd3fc; }
+
+        .error {
+            color: #f87171;
+            text-align: center;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        .toggle {
+            color: #38bdf8;
+            text-align: center;
+            font-size: 13px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>🚗 SmartTracker</h2>
+    <p>Smart Vehicle Tracking System</p>
+
+    <div id="nameField" style="display:none">
+        <input type="text" id="name" placeholder="Full Name" />
+    </div>
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+
+    <button onclick="handleSubmit()" id="submitBtn">Login</button>
+    <div class="toggle" onclick="toggleMode()" id="toggleText">
+        Don't have an account? Register
+    </div>
+    <div class="error" id="error"></div>
+</div>
+
+<script>
+    let isLogin = true;
+
+    function toggleMode() {
+        isLogin = !isLogin;
+        document.getElementById('nameField').style.display = isLogin ? 'none' : 'block';
+        document.getElementById('submitBtn').textContent = isLogin ? 'Login' : 'Register';
+        document.getElementById('toggleText').textContent = isLogin
+            ? "Don't have an account? Register"
+            : "Already have an account? Login";
+        document.getElementById('error').textContent = '';
+    }
+
+    async function handleSubmit() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const name = document.getElementById('name').value;
+        const url = isLogin ? '/api/auth/login' : '/api/auth/register';
+
+        const body = isLogin ? { email, password } : { name, email, password };
+
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('name', data.name);
+                window.location.href = '/dashboard.html';
+            } else {
+                document.getElementById('error').textContent = 'Invalid credentials!';
+            }
+        } catch (e) {
+            document.getElementById('error').textContent = 'Server error!';
+        }
+    }
+</script>
+</body>
+</html>

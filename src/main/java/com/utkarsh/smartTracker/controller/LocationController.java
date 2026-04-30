@@ -19,7 +19,22 @@ public class LocationController {
 
     // GPS Logger App Yahan Bhejega
     @PostMapping("/save")
-    public ResponseEntity<String> saveLocation(@RequestBody LocationRequest request) {
+    public ResponseEntity<String> saveLocation(
+            @RequestParam(required = false) Double latitude,
+            @RequestParam(required = false) Double longitude,
+            @RequestParam(required = false) Double speed,
+            @RequestBody(required = false) LocationRequest body) {
+
+        LocationRequest request = new LocationRequest();
+
+        if (body != null && body.getLatitude() != null) {
+            request = body;
+        } else {
+            request.setLatitude(latitude);
+            request.setLongitude(longitude);
+            request.setSpeed(speed);
+        }
+
         locationService.saveLocation(request);
         return ResponseEntity.ok("Location saved!");
     }
